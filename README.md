@@ -13,7 +13,7 @@ Constructed a serverless DevSecOps tool designed to enforce security compliance 
 
 ```mermaid
 graph TD
-    A[EventBridge Scheduler] -->|Triggers every 15 min| B(Lambda Function: Sentinel)
+    A[EventBridge Scheduler] -->|Triggers every 15 min| B(Lambda Function)
     B -->|1. DescribeSecurityGroups| C{AWS EC2 API}
     C -->|2. Return Rules| B
     B -->|3. Check for 0.0.0.0/0 on Port 22| D{Violation Found?}
