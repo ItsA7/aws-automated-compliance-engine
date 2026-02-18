@@ -21,6 +21,7 @@ graph TD
     E --> F[SNS Topic: SecurityAlerts];
     F -->|Email Notification| G[SecOps Team];
     D -- No --> H[End Execution];
+```
 
 ## How It Works
 1.  **Scheduled Execution:** EventBridge wakes up the Lambda function every 15 minutes.
