@@ -9,6 +9,19 @@ Constructed a serverless DevSecOps tool designed to enforce security compliance 
 * **Notification:** Amazon SNS (alerts security team upon remediation).
 * **Permissions:** IAM Role with least-privilege access (`ec2:Describe*`, `ec2:Revoke*`, `sns:Publish`).
 
+## 🏗 Architecture Diagram
+
+```mermaid
+graph TD
+    A[EventBridge Scheduler] -->|Triggers every 15 min| B(Lambda Function: Sentinel);
+    B -->|1. DescribeSecurityGroups| C{AWS EC2 API};
+    C -->|2. Return Rules| B;
+    B -->|3. Detect 0.0.0.0/0 on Port 22| D{Violation Found?};
+    D -- Yes --> E[Revoke Ingress Rule];
+    E --> F[SNS Topic: SecurityAlerts];
+    F -->|Email Notification| G[SecOps Team];
+    D -- No --> H[End Execution];
+
 ## How It Works
 1.  **Scheduled Execution:** EventBridge wakes up the Lambda function every 15 minutes.
 2.  **Continuous Polling:** The function enters a "Guard Dog" loop, scanning all Security Groups in the region every 5 seconds.
