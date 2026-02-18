@@ -13,14 +13,29 @@ Constructed a serverless DevSecOps tool designed to enforce security compliance 
 
 ```mermaid
 graph TD
-    A[EventBridge Scheduler] -->|Triggers every 15 min| B(Lambda Function)
-    B -->|1. DescribeSecurityGroups| C{AWS EC2 API}
-    C -->|2. Return Rules| B
-    B -->|3. Check for 0.0.0.0/0 on Port 22| D{Violation Found?}
-    D -- Yes --> E[Revoke Ingress Rule]
-    E --> F[SNS Topic: SecurityAlerts]
-    F -->|Email Notification| G[SecOps Team]
-    D -- No --> H[End Execution]
+    %% Nodes
+    Trigger([🕒 15-Min Scheduler]) -->|Wake Up| Lambda[⚡ Lambda Guard Dog]
+    
+    subgraph "Execution Loop"
+        Lambda -->|1. Scan| API{AWS API}
+        API -->|2. Return Rules| Lambda
+        Lambda -->|3. Check Logic| Decision{Any Open SSH?}
+    end
+    
+    Decision -- No --> Sleep([💤 Sleep / End])
+    Decision -- Yes --> Fix[🛡️ Revoke Rule]
+    
+    Fix -->|Success| Notify[📢 SNS Alert]
+    Notify --> Email[@ SecOps Team]
+
+    %% Styling
+    classDef aws fill:#FF9900,stroke:#232F3E,color:white,stroke-width:2px;
+    classDef sec fill:#D13212,stroke:#5A1005,color:white,stroke-width:2px;
+    classDef safe fill:#1D8102,stroke:#0E3F01,color:white,stroke-width:2px;
+
+    class Lambda,API,Notify aws;
+    class Fix,Decision sec;
+    class Trigger,Sleep,Email safe;
 ```
 
 ## How It Works
